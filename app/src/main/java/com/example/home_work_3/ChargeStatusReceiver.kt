@@ -6,7 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.BatteryManager
-import android.util.Log
+
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
@@ -30,9 +30,10 @@ class ChargeStatusReceiver: BroadcastReceiver() {
 
         updateNotification(context!!, notificationMsg)
         Toast.makeText(context, notificationMsg, Toast.LENGTH_LONG).show()
+        StatusLog("battery", (batteryStatusMap[status])!!, LogLevel.I).save().log()
     }
 
-    fun updateNotification(context: Context, data: String) {
+    private fun updateNotification(context: Context, data: String) {
         val notificationId = 1
 
         val notificationBuilder = NotificationCompat.Builder(context, "main_channel")
@@ -46,7 +47,6 @@ class ChargeStatusReceiver: BroadcastReceiver() {
                 Manifest.permission.POST_NOTIFICATIONS
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-            Log.w("mylog", "PERMISSION not GRANTED")
         } else {
             notificationManager.notify(notificationId, notificationBuilder.build())
         }

@@ -10,9 +10,8 @@ import com.google.gson.reflect.TypeToken
 import java.io.File
 import java.util.Date
 import java.util.Locale
-private val TAG = "MY_TAG"
 
-data class StatusLog(val subject:String, val status:String, val level: LogLevel) {
+data class StatusLog(val subject:String, val status:String, val level: LogLevel, val TAG: String = "MY_TAG") {
     public val date: String = SimpleDateFormat("dd/M/yyyy hh:mm:ss", Locale.ROOT).format(Date())!!
 
     public fun log() {
@@ -71,4 +70,3 @@ class LogSaver(fileName: String, val mainViewModel: MainViewModel) {
         return res.toMutableList()
     }
 }
-

@@ -7,14 +7,13 @@ import androidx.compose.runtime.Composable
 
 
 @Composable
-fun ControlSection(onStart: () -> Unit, onStop: () -> Unit) {
+fun ControlSection(onServiceStart: () -> Unit, onWorkerStart: () -> Unit) {
     Row {
-        Button(onClick = onStart) {
+        Button(onClick = onServiceStart) {
             Text(text = "start")
         }
-
-        Button(onClick = onStop) {
-            Text(text = "stop")
+        Button(onClick = onWorkerStart) {
+            Text(text = "start worker")
         }
     }
 }

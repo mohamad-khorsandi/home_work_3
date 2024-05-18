@@ -4,15 +4,12 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -77,16 +74,14 @@ class MainActivity : ComponentActivity() {
             ){
                 Text("CURRENT STATUS:")
                 Text("$reportSubject is $reportStatus")
-                Spacer(modifier = Modifier.height(30.dp))
-                ControlSection(onStartClick, onStartWorker)
-                Spacer(modifier = Modifier.height(30.dp))
-                Text(text = "LOG HISTORY:", style = MaterialTheme.typography.titleLarge)
-                for (log in logList) {
-                    Text( log.getMsg())
-                }
+
+                ControlSection(onStartClick, onStartWorker, modifier = Modifier.padding(top=30.dp))
+
+                LogSection(logList, modifier = Modifier.padding(top=30.dp))
             }
         }
     }
+
     override fun onStop() {
         super.onStop()
         logSaver.writeToFile()

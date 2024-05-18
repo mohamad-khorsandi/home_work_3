@@ -1,55 +1,72 @@
 package com.example.home_work_3
 
-import android.text.format.DateFormat
+import android.icu.text.SimpleDateFormat
 import android.util.Log
-import kotlinx.serialization.*
-import kotlinx.serialization.json.*
+import androidx.compose.runtime.State
+import com.example.home_work_3.MainActivity.Companion.logSaver
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+
 import java.io.File
+import java.util.Date
+import java.util.Locale
 
-val logSaver = LogSaver("logs.txt")
+data class StatusLog(val subject:String, val status:String, val level: LogLevel, val TAG: String = "MY_TAG") {
+    public val date: String = SimpleDateFormat("dd/M/yyyy hh:mm:ss", Locale.ROOT).format(Date())!!
 
-@Serializable
-data class StatusLog(val subject:String, val status:String, val date: DateFormat) {
-    private val msg: String = "$subject is $status"
-    companion object {
-        const val TAG = "MY_TAG"
-    }
-    fun w() {
-        Log.w(TAG, msg)
-    }
-
-    fun i() {
-        Log.i(TAG, msg)
+    public fun log() {
+        when(level) {
+            LogLevel.D -> Log.w(TAG, getMsg())
+            LogLevel.I -> Log.i(TAG, getMsg())
+            LogLevel.E -> Log.e(TAG, getMsg())
+            else -> TODO()
+        }
     }
 
-    fun d() {
-        Log.d(TAG, msg)
+    public fun getMsg(): String {
+        return "$date $subject is $status"
+    }
+
+    fun save(): StatusLog {
+        logSaver.addLog(this)
+        return this
     }
 }
 
-class LogSaver(fileName: String) {
+
+enum class LogLevel {
+    E,I,D
+}
+
+class LogSaver(fileName: String, val mainViewModel: MainViewModel) {
     private var file: File = File(fileName)
-    private lateinit var logList: MutableList<StatusLog>
+    private val gson = Gson()
 
     init {
         if (file.exists()) {
-            logList = readFromFile()
+            mainViewModel.addAll(readFromFile())
         } else {
             file.createNewFile()
         }
     }
 
     fun addLog(statusLog: StatusLog) {
-        logList.add(statusLog)
+        mainViewModel.addLog(statusLog)
     }
 
-    private fun writeToFile() {
-        val jsonLogs = Json.encodeToString<MutableList<StatusLog>>(logList)
-        file.writeText(jsonLogs)
+    public fun writeToFile() {
+        val arrayTpe = object : TypeToken<MutableList<StatusLog>>() {}.type
+        val res: String = gson.toJson(mainViewModel.logs.value, arrayTpe)
+        file.writeText(res)
     }
 
     private fun readFromFile(): MutableList<StatusLog>
     {
-        return Json.decodeFromString<MutableList<StatusLog>>(file.readText())
+        if (file.readText().isEmpty()) {
+            return mutableListOf()
+        }
+        val arrayType = object : TypeToken<List<StatusLog>>() {}.type
+        val res: List<StatusLog> = gson.fromJson(file.readText(), arrayType)
+        return res.toMutableList()
     }
 }
